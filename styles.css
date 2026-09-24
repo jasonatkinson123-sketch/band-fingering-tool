@@ -293,7 +293,7 @@ h1 {
 .fingering-label {
   margin: 16px 0 0;
   text-align: center;
-  font-size: clamp(1.5rem, 5vw, 2.4rem);
+  font-size: clamp(1.2rem, 4vw, 2.2rem);
   font-weight: 1000;
 }
 .fingering-note {
@@ -302,6 +302,7 @@ h1 {
   line-height: 1.45;
 }
 .valve-svg { width: min(100%, 460px); margin: 0 auto; display: block; }
+.flute-svg { width: min(100%, 620px); height: auto; margin: 0 auto; display: block; }
 
 .detail-nav {
   border-top: 4px solid var(--ink);
@@ -333,6 +334,14 @@ h1 {
   font-size: .92rem;
   line-height: 1.4;
 }
+
+.audit-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 18px;
+}
+.audit-active { background: var(--gold); }
 
 .audit-table-wrap {
   border: 3px solid var(--ink);
@@ -382,6 +391,8 @@ h1 {
   .site-footer { flex-direction: column; }
   .detail-nav { grid-template-columns: 1fr 1fr; }
   .current-chip { grid-column: 1 / -1; grid-row: 1; text-align: center; }
+  .fingering-panel { overflow-x: auto; }
+  .flute-svg { min-width: 520px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
