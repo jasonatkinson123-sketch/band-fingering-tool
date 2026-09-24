@@ -1,4 +1,4 @@
-export function renderValveDiagram(valves = [], { mini = false } = {}) {
+export function renderValveDiagram(valves = [], { mini = false, instrumentName = 'Valve instrument' } = {}) {
   const pressed = new Set(valves);
   const height = mini ? 120 : 260;
   const viewBox = '0 0 520 290';
@@ -24,7 +24,7 @@ export function renderValveDiagram(valves = [], { mini = false } = {}) {
   const label = valves.length ? valves.join(' + ') : 'OPEN';
 
   return `
-    <svg class="valve-svg ${mini ? 'audit-mini' : ''}" viewBox="${viewBox}" style="height:${height}px" role="img" aria-label="Trumpet fingering ${label}">
+    <svg class="valve-svg ${mini ? 'audit-mini' : ''}" viewBox="${viewBox}" style="height:${height}px" role="img" aria-label="${instrumentName} fingering ${label}">
       <path d="M52 208 H128 M392 208 H470" stroke="#18233e" stroke-width="14" stroke-linecap="round" fill="none"/>
       <path d="M460 184 L505 208 L460 232 Z" fill="#f0c85e" stroke="#18233e" stroke-width="5"/>
       <path d="M58 208 C38 190 38 226 58 208" fill="none" stroke="#18233e" stroke-width="5"/>
