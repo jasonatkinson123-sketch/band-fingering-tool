@@ -1,0 +1,51 @@
+export const trumpet = {
+  id: 'trumpet',
+  name: 'Trumpet',
+  icon: '🎺',
+  clef: 'treble',
+  transposition: 'Bb',
+  status: 'verified',
+  verification: {
+    sourceName: 'Yamaha Musical Instrument Guide — Trumpet fingering chart',
+    sourceUrl: 'https://www.yamaha.com/en/musical_instrument_guide/common/images/trumpet/fingering.pdf',
+    reviewed: '2026-09-24',
+    scope: 'Primary standard fingerings only; alternate fingerings on the source chart are intentionally omitted.'
+  },
+  ranges: {
+    beginner: { min: 'C4', max: 'C5', label: 'C4–C5' },
+    full: { min: 'F#3', max: 'C6', label: 'F♯3–C6' }
+  },
+  notes: [
+    { pitch: 'F#3', valves: [1,2,3] },
+    { pitch: 'G3',  valves: [1,3] },
+    { pitch: 'Ab3', valves: [2,3] },
+    { pitch: 'A3',  valves: [1,2] },
+    { pitch: 'Bb3', valves: [1] },
+    { pitch: 'B3',  valves: [2] },
+    { pitch: 'C4',  valves: [] },
+    { pitch: 'C#4', valves: [1,2,3] },
+    { pitch: 'D4',  valves: [1,3] },
+    { pitch: 'Eb4', valves: [2,3] },
+    { pitch: 'E4',  valves: [1,2] },
+    { pitch: 'F4',  valves: [1] },
+    { pitch: 'F#4', valves: [2] },
+    { pitch: 'G4',  valves: [] },
+    { pitch: 'Ab4', valves: [2,3] },
+    { pitch: 'A4',  valves: [1,2] },
+    { pitch: 'Bb4', valves: [1] },
+    { pitch: 'B4',  valves: [2] },
+    { pitch: 'C5',  valves: [] },
+    { pitch: 'C#5', valves: [1,2] },
+    { pitch: 'D5',  valves: [1] },
+    { pitch: 'Eb5', valves: [2] },
+    { pitch: 'E5',  valves: [] },
+    { pitch: 'F5',  valves: [1] },
+    { pitch: 'F#5', valves: [2] },
+    { pitch: 'G5',  valves: [] },
+    { pitch: 'Ab5', valves: [2,3] },
+    { pitch: 'A5',  valves: [1,2] },
+    { pitch: 'Bb5', valves: [1] },
+    { pitch: 'B5',  valves: [2] },
+    { pitch: 'C6',  valves: [] }
+  ]
+};
