@@ -23,14 +23,16 @@ const KEY_LAYOUT = [
   { id: 'rhPinkyE', label: 'RH E/B', x: 522, y: 52, r: 9, kind: 'small' },
   { id: 'rhPinkyF', label: 'RH F/C', x: 542, y: 64, r: 9, kind: 'small' },
   { id: 'rhPinkyFSharp', label: 'RH F♯/C♯', x: 562, y: 52, r: 9, kind: 'small' },
-  { id: 'rhPinkyGSharp', label: 'RH G♯/D♯', x: 582, y: 64, r: 9, kind: 'small' }
+  { id: 'rhPinkyGSharp', label: 'RH G♯/D♯', x: 582, y: 64, r: 9, kind: 'small' },
+  { id: 'lowEb', label: 'Low E♭ extension', x: 610, y: 153, r: 11, kind: 'small', lowOnly: true }
 ];
 
 export const CLARINET_KEY_IDS = KEY_LAYOUT.map(k => k.id);
 
-export function renderClarinetDiagram(keys = [], { mini = false } = {}) {
+export function renderClarinetDiagram(keys = [], { mini = false, lowExtension = false } = {}) {
   const pressed = new Set(keys);
-  const controls = KEY_LAYOUT.map(key => {
+  const visible = KEY_LAYOUT.filter(key => lowExtension || !key.lowOnly);
+  const controls = visible.map(key => {
     const down = pressed.has(key.id);
     return `
       <g aria-label="${key.label} ${down ? 'pressed' : 'open'}">
@@ -43,6 +45,7 @@ export function renderClarinetDiagram(keys = [], { mini = false } = {}) {
     <svg class="clarinet-svg ${mini ? 'audit-mini' : ''}" viewBox="0 0 660 220" role="img" aria-label="Boehm-system clarinet fingering diagram">
       <line x1="46" y1="105" x2="615" y2="105" stroke="#18233e" stroke-width="18" stroke-linecap="round"/>
       <path d="M615 87 L645 105 L615 123 Z" fill="#f0c85e" stroke="#18233e" stroke-width="4"/>
+      ${lowExtension ? '<line x1="590" y1="112" x2="610" y2="153" stroke="#18233e" stroke-width="4"/>' : ''}
       ${controls}
       <text x="205" y="188" text-anchor="middle" font-size="14" font-weight="900" fill="#4a5877">LEFT HAND</text>
       <text x="465" y="188" text-anchor="middle" font-size="14" font-weight="900" fill="#4a5877">RIGHT HAND</text>
