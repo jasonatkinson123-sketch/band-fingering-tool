@@ -4,6 +4,8 @@ export const trumpet = {
   icon: '🎺',
   clef: 'treble',
   transposition: 'Bb',
+  fingeringType: 'valves',
+  registerBaseOctave: 3,
   status: 'verified',
   verification: {
     sourceName: 'Yamaha Musical Instrument Guide — Trumpet fingering chart',
