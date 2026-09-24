@@ -4,6 +4,7 @@ export const tuba = {
   icon:'◎',
   clef:'bass',
   transposition:'C',
+  configuration:'3-valve BB♭ tuba',
   fingeringType:'valves',
   diagramFamily:'valve',
   registerBaseOctave:1,
