@@ -18,7 +18,10 @@ export function renderStaff(pitch, clef = 'treble') {
   const bottomPitch = clef === 'bass' ? 'G2' : 'E4';
   const bottomIndex = diatonicIndex(bottomPitch);
   const stepsFromBottom = diatonicIndex(pitch) - bottomIndex;
-  const staffBottomY = 74;
+
+  // The larger vertical canvas keeps practical middle-school ledger-line notes
+  // visible for both flute/sax upper ranges and tuba/trombone lower ranges.
+  const staffBottomY = 112;
   const step = 6;
   const noteY = staffBottomY - stepsFromBottom * step;
   const lineYs = [0,1,2,3,4].map(i => staffBottomY - i * step * 2);
@@ -28,12 +31,13 @@ export function renderStaff(pitch, clef = 'treble') {
   const stem = stemDown
     ? `<line x1="126" y1="${noteY}" x2="126" y2="${noteY + 38}" stroke="currentColor" stroke-width="3"/>`
     : `<line x1="146" y1="${noteY}" x2="146" y2="${noteY - 38}" stroke="currentColor" stroke-width="3"/>`;
+
   const glyph = clef === 'bass' ? '𝄢' : '𝄞';
-  const clefY = clef === 'bass' ? 75 : 86;
+  const clefY = clef === 'bass' ? 113 : 124;
   const clefSize = clef === 'bass' ? 54 : 66;
 
   return `
-    <svg class="staff-svg" viewBox="0 0 260 142" role="img" aria-label="${pitch} on ${clef} clef staff">
+    <svg class="staff-svg" viewBox="0 0 260 200" role="img" aria-label="${pitch} on ${clef} clef staff">
       <g fill="none" stroke="currentColor" stroke-width="2">
         ${lineYs.map(y => `<line x1="16" y1="${y}" x2="244" y2="${y}"/>`).join('')}
         ${ledger.map(y => `<line x1="118" y1="${y}" x2="153" y2="${y}" stroke-width="2.4"/>`).join('')}
