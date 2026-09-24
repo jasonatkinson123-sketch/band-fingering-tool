@@ -1,5 +1,6 @@
 import { instruments } from '../src/data/instruments.js';
 import { pitchRank } from '../src/components/pitch.js';
+import { FLUTE_KEY_IDS } from '../src/diagrams/fluteDiagram.js';
 
 let failures = 0;
 function assert(condition, message) {
@@ -8,6 +9,10 @@ function assert(condition, message) {
     console.error(`FAIL: ${message}`);
   }
 }
+
+const rendererKeySets = {
+  flute: new Set(FLUTE_KEY_IDS)
+};
 
 for (const instrument of instruments) {
   if (instrument.status !== 'verified') continue;
@@ -27,6 +32,12 @@ for (const instrument of instruments) {
       assert(Array.isArray(note.valves), `${note.pitch} valves is an array`);
       assert(new Set(note.valves).size === note.valves.length, `${note.pitch} has no duplicate valves`);
       assert(note.valves.every(v => Number.isInteger(v) && v >= 1 && v <= 3), `${note.pitch} valves are 1–3`);
+    } else if ('keys' in note) {
+      assert(Array.isArray(note.keys), `${note.pitch} keys is an array`);
+      assert(new Set(note.keys).size === note.keys.length, `${note.pitch} has no duplicate keys`);
+      const supported = rendererKeySets[instrument.id] || new Set(instrument.diagramKeys || []);
+      assert(note.keys.every(key => supported.has(key)), `${note.pitch} uses only known diagram keys`);
+      assert(typeof note.sourceNotation === 'string' && note.sourceNotation.length > 0, `${note.pitch} preserves source notation`);
     } else {
       assert(false, `${note.pitch} has a supported fingering representation`);
     }
