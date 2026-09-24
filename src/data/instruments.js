@@ -1,9 +1,10 @@
 import { flute } from './flute.js';
+import { clarinet } from './clarinet.js';
 import { trumpet } from './trumpet.js';
 
 export const instruments = [
   flute,
-  { id: 'clarinet', name: 'Clarinet', icon: '♩', status: 'pending' },
+  clarinet,
   { id: 'bass-clarinet', name: 'Bass Clarinet', icon: '♩', status: 'pending' },
   { id: 'alto-sax', name: 'Alto Saxophone', icon: '🎷', status: 'pending' },
   { id: 'tenor-sax', name: 'Tenor Saxophone', icon: '🎷', status: 'pending' },
