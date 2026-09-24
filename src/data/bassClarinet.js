@@ -9,6 +9,7 @@ export const bassClarinet = {
   clef: 'treble',
   transposition: 'Bb',
   system: 'Boehm',
+  configuration: 'Low-E♭ bass clarinet',
   fingeringType: 'keys',
   diagramFamily: 'clarinet',
   lowExtension: true,
