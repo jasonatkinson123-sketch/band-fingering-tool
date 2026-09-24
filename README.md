@@ -69,7 +69,7 @@ The audit view displays every encoded fingering and rendered diagram side by sid
 npm run validate
 ```
 
-A GitHub Actions workflow also runs the validation suite and JavaScript syntax checks on pushes and pull requests.
+A GitHub Actions workflow is configured to run the validation suite and JavaScript syntax checks on pushes and pull requests.
 
 ## GitHub Pages
 
