@@ -6,15 +6,16 @@ export const clarinet = {
   transposition: 'Bb',
   system: 'Boehm',
   fingeringType: 'keys',
-  status: 'verifying',
+  diagramFamily: 'clarinet',
+  registerBaseOctave: 3,
+  status: 'verified',
   verification: {
     sourceName: 'Yamaha Musical Instrument Guide — Clarinet fingering chart',
     sourceUrl: 'https://www.yamaha.com/en/musical_instrument_guide/common/images/clarinet/fingering.pdf',
-    sourcePageUrl: 'https://www.yamaha.com/en/musical_instrument_guide/clarinet/play/play002.html',
-    crossCheckName: 'The Woodwind Fingering Guide — Boehm-system clarinet',
+    crossCheckName: 'The Woodwind Fingering Guide — Basic Boehm-system clarinet',
     crossCheckUrl: 'https://www.wfg.woodwind.org/clarinet/',
     reviewed: '2026-09-24',
-    scope: 'Official Yamaha Boehm-system source located. Deterministic key IDs are established; primary middle-school fingerings still require transcription and audit before the Clarinet button is enabled.'
+    scope: 'Primary Boehm-system fingerings from written E3 through C6. Where equivalent left/right pinky choices exist, one valid standard fingering is shown; alternates remain intentionally omitted.'
   },
   diagramKeys: [
     'register','thumb','lhA','lhGSharpSide','lh1','lh2','lh3','lhEbSliver',
@@ -22,6 +23,43 @@ export const clarinet = {
     'rh1','rh2','rh3','rhSide1','rhSide2','rhSide3','rhSide4','rhSliverB',
     'rhPinkyE','rhPinkyF','rhPinkyFSharp','rhPinkyGSharp'
   ],
-  notes: [],
-  ranges: null
+  ranges: {
+    beginner: { min: 'G3', max: 'G5', label: 'G3–G5' },
+    full: { min: 'E3', max: 'C6', label: 'E3–C6' }
+  },
+  notes: [
+    { pitch:'E3',  keys:['thumb','lh1','lh2','lh3','rh1','rh2','rh3','lhPinkyE'], sourceNotation:'T 123ᴱ | 123' },
+    { pitch:'F3',  keys:['thumb','lh1','lh2','lh3','rh1','rh2','rh3','rhPinkyF'], sourceNotation:'T 123 | 123 + RH F' },
+    { pitch:'F#3', keys:['thumb','lh1','lh2','lh3','rh1','rh2','rh3','lhPinkyFSharp'], sourceNotation:'T 123F♯ | 123' },
+    { pitch:'G3',  keys:['thumb','lh1','lh2','lh3','rh1','rh2','rh3'], sourceNotation:'T 123 | 123' },
+    { pitch:'Ab3', keys:['thumb','lh1','lh2','lh3','rh1','rh2','rh3','rhPinkyGSharp'], sourceNotation:'T 123 | 123 + RH G♯' },
+    { pitch:'A3',  keys:['thumb','lh1','lh2','lh3','rh1','rh2'], sourceNotation:'T 123 | 12–' },
+    { pitch:'Bb3', keys:['thumb','lh1','lh2','lh3','rh1'], sourceNotation:'T 123 | 1––' },
+    { pitch:'B3',  keys:['thumb','lh1','lh2','lh3','rh2'], sourceNotation:'T 123 | –2–' },
+    { pitch:'C4',  keys:['thumb','lh1','lh2','lh3'], sourceNotation:'T 123 | –––' },
+    { pitch:'C#4', keys:['thumb','lh1','lh2','lh3','lhPinkyCSharp'], sourceNotation:'T 123C♯ | –––' },
+    { pitch:'D4',  keys:['thumb','lh1','lh2'], sourceNotation:'T 12– | –––' },
+    { pitch:'Eb4', keys:['thumb','lh1','lh2','rhSide4'], sourceNotation:'T 12– | side 4' },
+    { pitch:'E4',  keys:['thumb','lh1'], sourceNotation:'T 1–– | –––' },
+    { pitch:'F4',  keys:['thumb'], sourceNotation:'T ––– | –––' },
+    { pitch:'F#4', keys:['lh1'], sourceNotation:'1–– | –––' },
+    { pitch:'G4',  keys:[], sourceNotation:'open' },
+    { pitch:'Ab4', keys:['lhGSharpSide'], sourceNotation:'G♯ throat key' },
+    { pitch:'A4',  keys:['lhA'], sourceNotation:'A throat key' },
+    { pitch:'Bb4', keys:['register','lhA'], sourceNotation:'R + A' },
+    { pitch:'B4',  keys:['register','thumb','lh1','lh2','lh3','rh1','rh2','rh3','lhPinkyE'], sourceNotation:'RT 123ᴱ | 123' },
+    { pitch:'C5',  keys:['register','thumb','lh1','lh2','lh3','rh1','rh2','rh3','rhPinkyF'], sourceNotation:'RT 123 | 123 + RH F' },
+    { pitch:'C#5', keys:['register','thumb','lh1','lh2','lh3','rh1','rh2','rh3','lhPinkyFSharp'], sourceNotation:'RT 123F♯ | 123' },
+    { pitch:'D5',  keys:['register','thumb','lh1','lh2','lh3','rh1','rh2','rh3'], sourceNotation:'RT 123 | 123' },
+    { pitch:'Eb5', keys:['register','thumb','lh1','lh2','lh3','rh1','rh2','rh3','rhPinkyGSharp'], sourceNotation:'RT 123 | 123 + RH G♯' },
+    { pitch:'E5',  keys:['register','thumb','lh1','lh2','lh3','rh1','rh2'], sourceNotation:'RT 123 | 12–' },
+    { pitch:'F5',  keys:['register','thumb','lh1','lh2','lh3','rh1'], sourceNotation:'RT 123 | 1––' },
+    { pitch:'F#5', keys:['register','thumb','lh1','lh2','lh3','rh2'], sourceNotation:'RT 123 | –2–' },
+    { pitch:'G5',  keys:['register','thumb','lh1','lh2','lh3'], sourceNotation:'RT 123 | –––' },
+    { pitch:'Ab5', keys:['register','thumb','lh1','lh2','lh3','lhPinkyCSharp'], sourceNotation:'RT 123C♯ | –––' },
+    { pitch:'A5',  keys:['register','thumb','lh1','lh2'], sourceNotation:'RT 12– | –––' },
+    { pitch:'Bb5', keys:['register','thumb','lh1','lh2','rhSide4'], sourceNotation:'RT 12– | side 4' },
+    { pitch:'B5',  keys:['register','thumb','lh1'], sourceNotation:'RT 1–– | –––' },
+    { pitch:'C6',  keys:['register','thumb'], sourceNotation:'RT ––– | –––' }
+  ]
 };
