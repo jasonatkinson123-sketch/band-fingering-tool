@@ -4,6 +4,7 @@ export const trombone = {
   icon:'↔',
   clef:'bass',
   transposition:'C',
+  configuration:'Straight tenor trombone',
   fingeringType:'position',
   diagramFamily:'trombone',
   registerBaseOctave:2,
