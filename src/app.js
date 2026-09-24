@@ -2,6 +2,7 @@ import { instruments, instrumentById } from './data/instruments.js';
 import { displayPitch, pitchRank } from './components/pitch.js';
 import { renderStaff } from './components/staff.js';
 import { renderValveDiagram } from './diagrams/valveDiagram.js';
+import { renderFluteDiagram } from './diagrams/fluteDiagram.js';
 
 const app = document.querySelector('#app');
 const homeButton = document.querySelector('#homeButton');
@@ -27,11 +28,50 @@ function notesForRange(instrument) {
   });
 }
 
-function registerGroup(pitch) {
+function registerGroup(instrument, pitch) {
   const octave = Number(pitch.match(/(-?\d+)$/)[1]);
-  if (octave <= 3) return 'Low';
-  if (octave === 4) return 'Middle';
+  const base = instrument.registerBaseOctave ?? 3;
+  if (octave <= base) return 'Low';
+  if (octave === base + 1) return 'Middle';
   return 'High';
+}
+
+function fingeringLabel(instrument, note) {
+  if (instrument.fingeringType === 'valves') {
+    return note.valves.length ? note.valves.join(' + ') : 'OPEN';
+  }
+  if (instrument.fingeringType === 'keys') {
+    return note.sourceNotation;
+  }
+  return '';
+}
+
+function renderDiagram(instrument, note, options = {}) {
+  if (instrument.fingeringType === 'valves') return renderValveDiagram(note.valves, options);
+  if (instrument.id === 'flute') return renderFluteDiagram(note.keys, options);
+  return '<p>Diagram renderer not available.</p>';
+}
+
+function fingeringInstruction(instrument, note) {
+  if (instrument.fingeringType === 'valves') {
+    if (!note.valves.length) return 'No valves pressed.';
+    const label = note.valves.join(' + ');
+    return `Press valve${note.valves.length > 1 ? 's' : ''} ${label}.`;
+  }
+  if (instrument.id === 'flute') {
+    return 'Pressed controls are highlighted. “T” means the primary B-natural thumb lever; E♭ is the right-pinky E♭ key.';
+  }
+  return 'Follow the highlighted controls.';
+}
+
+function accuracyNote(instrument) {
+  if (instrument.id === 'trumpet') {
+    return 'Alternate trumpet fingerings are intentionally not shown. The app uses the primary fingering on the verified source chart.';
+  }
+  if (instrument.id === 'flute') {
+    return 'This version uses primary closed-G♯ concert-flute fingerings only. Alternate, trill, harmonic, and special-purpose fingerings are intentionally omitted.';
+  }
+  return 'Primary standard fingerings only.';
 }
 
 function renderHome() {
@@ -72,6 +112,7 @@ function openInstrument(id) {
   if (!instrument || instrument.status !== 'verified') return;
   state.instrumentId = id;
   state.selectedPitch = null;
+  state.rangeMode = 'beginner';
   homeButton.classList.remove('hidden');
   renderNotePicker();
 }
@@ -80,7 +121,7 @@ function renderNotePicker() {
   const instrument = instrumentById[state.instrumentId];
   const notes = notesForRange(instrument);
   const groups = notes.reduce((acc, note) => {
-    const group = registerGroup(note.pitch);
+    const group = registerGroup(instrument, note.pitch);
     (acc[group] ||= []).push(note);
     return acc;
   }, {});
@@ -117,7 +158,7 @@ function renderNotePicker() {
         </section>`).join('')}
     </div>
 
-    <p class="notice"><strong>Accuracy note:</strong> alternate trumpet fingerings are intentionally not shown in this first version. The app uses the primary fingering shown first on the verified source chart.</p>`;
+    <p class="notice"><strong>Accuracy note:</strong> ${escapeHtml(accuracyNote(instrument))}</p>`;
 
   app.querySelectorAll('[data-range]').forEach(button => {
     button.addEventListener('click', () => {
@@ -140,7 +181,7 @@ function renderFingering(pitch) {
   const note = notes[index];
   const previous = notes[index - 1] || null;
   const next = notes[index + 1] || null;
-  const label = note.valves.length ? note.valves.join(' + ') : 'OPEN';
+  const label = fingeringLabel(instrument, note);
 
   app.innerHTML = `
     <div class="toolbar">
@@ -164,9 +205,9 @@ function renderFingering(pitch) {
         </section>
         <section class="fingering-panel">
           <p class="eyebrow">Standard primary fingering</p>
-          ${renderValveDiagram(note.valves)}
-          <div class="fingering-label">${label}</div>
-          <p class="fingering-note">${note.valves.length ? `Press valve${note.valves.length > 1 ? 's' : ''} ${label}.` : 'No valves pressed.'}</p>
+          ${renderDiagram(instrument, note)}
+          <div class="fingering-label">${escapeHtml(label)}</div>
+          <p class="fingering-note">${escapeHtml(fingeringInstruction(instrument, note))}</p>
         </section>
       </div>
       <nav class="detail-nav" aria-label="Adjacent notes">
@@ -194,21 +235,35 @@ function renderFingering(pitch) {
   app.querySelector('[data-nav="next"]').addEventListener('click', () => next && renderFingering(next.pitch));
 }
 
-function renderAudit() {
+function auditInstrumentId() {
+  const requested = new URLSearchParams(location.search).get('audit');
+  if (requested && requested !== '1' && instrumentById[requested]?.status === 'verified') return requested;
+  return instruments.find(i => i.status === 'verified')?.id || 'trumpet';
+}
+
+function renderAudit(instrumentId = auditInstrumentId()) {
   homeButton.classList.remove('hidden');
   auditLink.classList.add('hidden');
-  const instrument = instrumentById.trumpet;
+  const instrument = instrumentById[instrumentId];
+
   app.innerHTML = `
     <section class="hero">
       <p class="eyebrow">Teacher mode</p>
       <h1>Fingering audit.</h1>
-      <p class="lede">Every student-visible trumpet fingering is shown here from the same structured data used by the main app. This page exists to make mistakes conspicuous.</p>
+      <p class="lede">Every student-visible fingering below is rendered from the same structured data used by the main app. This page exists to make mistakes conspicuous before students see them.</p>
     </section>
+
+    <div class="audit-switcher" aria-label="Choose audit instrument">
+      ${instruments.filter(i => i.status === 'verified').map(i => `
+        <button type="button" class="quiet-button ${i.id === instrument.id ? 'audit-active' : ''}" data-audit-instrument="${i.id}">${escapeHtml(i.name)}</button>
+      `).join('')}
+    </div>
 
     <div class="audit-source">
       <span class="status-pill">Verified</span>
       <h2 style="margin-top:12px">${escapeHtml(instrument.name)}</h2>
-      <p><strong>Source:</strong> <a href="${instrument.verification.sourceUrl}" target="_blank" rel="noreferrer">${escapeHtml(instrument.verification.sourceName)}</a></p>
+      <p><strong>Primary source:</strong> <a href="${instrument.verification.sourceUrl}" target="_blank" rel="noreferrer">${escapeHtml(instrument.verification.sourceName)}</a></p>
+      ${instrument.verification.crossCheckUrl ? `<p><strong>Cross-check:</strong> <a href="${instrument.verification.crossCheckUrl}" target="_blank" rel="noreferrer">${escapeHtml(instrument.verification.crossCheckName)}</a></p>` : ''}
       <p><strong>Reviewed:</strong> ${escapeHtml(instrument.verification.reviewed)}</p>
       <p>${escapeHtml(instrument.verification.scope)}</p>
     </div>
@@ -220,12 +275,20 @@ function renderAudit() {
           ${instrument.notes.map(note => `
             <tr>
               <td><strong>${displayPitch(note.pitch, true)}</strong></td>
-              <td>${note.valves.length ? note.valves.join(' + ') : 'OPEN'}</td>
-              <td>${renderValveDiagram(note.valves, { mini: true })}</td>
+              <td>${escapeHtml(fingeringLabel(instrument, note))}</td>
+              <td>${renderDiagram(instrument, note, { mini: true })}</td>
             </tr>`).join('')}
         </tbody>
       </table>
     </div>`;
+
+  app.querySelectorAll('[data-audit-instrument]').forEach(button => {
+    button.addEventListener('click', () => {
+      const id = button.dataset.auditInstrument;
+      history.replaceState({}, '', `?audit=${id}`);
+      renderAudit(id);
+    });
+  });
 }
 
 homeButton.addEventListener('click', () => {
@@ -236,5 +299,5 @@ homeButton.addEventListener('click', () => {
 });
 
 const params = new URLSearchParams(location.search);
-if (params.get('audit') === '1') renderAudit();
+if (params.has('audit')) renderAudit();
 else renderHome();
