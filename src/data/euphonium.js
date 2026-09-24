@@ -4,6 +4,7 @@ export const euphonium = {
   icon:'◉',
   clef:'bass',
   transposition:'C',
+  configuration:'3-valve B♭ baritone/euphonium',
   fingeringType:'valves',
   diagramFamily:'valve',
   registerBaseOctave:2,
