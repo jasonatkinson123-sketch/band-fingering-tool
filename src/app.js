@@ -14,7 +14,8 @@ const auditLink = document.querySelector('#auditLink');
 const state = {
   instrumentId: null,
   rangeMode: 'beginner',
-  selectedPitch: null
+  selectedPitch: null,
+  selectedSpelling: null
 };
 
 function escapeHtml(str) {
@@ -28,6 +29,30 @@ function notesForRange(instrument) {
   return instrument.notes.filter(note => {
     const rank = pitchRank(note.pitch);
     return rank >= min && rank <= max;
+  });
+}
+
+const commonEnharmonics = {
+  'C#': 'Db', 'Db': 'C#',
+  'D#': 'Eb', 'Eb': 'D#',
+  'F#': 'Gb', 'Gb': 'F#',
+  'G#': 'Ab', 'Ab': 'G#',
+  'A#': 'Bb', 'Bb': 'A#'
+};
+
+function enharmonicPitch(pitch) {
+  const match = /^([A-G])([#b]?)(-?\d+)$/.exec(pitch);
+  if (!match) return null;
+  const alias = commonEnharmonics[match[1] + match[2]];
+  return alias ? `${alias}${match[3]}` : null;
+}
+
+function noteChoicesForRange(instrument) {
+  return notesForRange(instrument).flatMap(note => {
+    const alias = enharmonicPitch(note.pitch);
+    return alias
+      ? [{ note, pitch: note.pitch }, { note, pitch: alias }]
+      : [{ note, pitch: note.pitch }];
   });
 }
 
@@ -129,6 +154,7 @@ function configurationLabel(instrument) {
 function renderHome() {
   state.instrumentId = null;
   state.selectedPitch = null;
+  state.selectedSpelling = null;
   homeButton.classList.add('hidden');
   auditLink.classList.remove('hidden');
 
@@ -170,6 +196,7 @@ function openInstrument(id) {
   if (!instrument || instrument.status !== 'verified') return;
   state.instrumentId = id;
   state.selectedPitch = null;
+  state.selectedSpelling = null;
   state.rangeMode = 'beginner';
   homeButton.classList.remove('hidden');
   renderNotePicker();
@@ -177,10 +204,10 @@ function openInstrument(id) {
 
 function renderNotePicker() {
   const instrument = instrumentById[state.instrumentId];
-  const notes = notesForRange(instrument);
-  const groups = notes.reduce((acc, note) => {
-    const group = registerGroup(instrument, note.pitch);
-    (acc[group] ||= []).push(note);
+  const choices = noteChoicesForRange(instrument);
+  const groups = choices.reduce((acc, choice) => {
+    const group = registerGroup(instrument, choice.pitch);
+    (acc[group] ||= []).push(choice);
     return acc;
   }, {});
 
@@ -188,12 +215,12 @@ function renderNotePicker() {
     <section class="hero compact-hero">
       <p class="eyebrow">${escapeHtml(instrument.name)} • written pitch</p>
       <h1>Choose a note.</h1>
-      <p class="lede">Primary standard fingering or position only. ${escapeHtml(configurationLabel(instrument))}</p>
+      <p class="lede">Choose the note exactly as it appears in your music. Enharmonic spellings have their own buttons. ${escapeHtml(configurationLabel(instrument))}</p>
     </section>
 
     <div class="toolbar">
       <div>
-        <strong>${notes.length} verified notes</strong><br>
+        <strong>${choices.length} note choices • verified fingering data</strong><br>
         <span class="octave-label">Range: ${escapeHtml(instrument.ranges[state.rangeMode].label)}</span>
       </div>
       <div class="segmented" aria-label="Range mode">
@@ -207,10 +234,10 @@ function renderNotePicker() {
         <section class="note-section">
           <h3>${group}</h3>
           <div class="note-grid">
-            ${groups[group].map(note => `
-              <button class="note-button" type="button" data-pitch="${note.pitch}">
-                ${displayPitch(note.pitch)}
-                <small>${note.pitch.replace(/[A-G][#b]?/, '')}</small>
+            ${groups[group].map(choice => `
+              <button class="note-button" type="button" data-source-pitch="${choice.note.pitch}" data-display-pitch="${choice.pitch}">
+                ${displayPitch(choice.pitch)}
+                <small>${choice.pitch.replace(/[A-G][#b]?/, '')}</small>
               </button>`).join('')}
           </div>
         </section>`).join('')}
@@ -225,21 +252,23 @@ function renderNotePicker() {
     });
   });
 
-  app.querySelectorAll('[data-pitch]').forEach(button => {
-    button.addEventListener('click', () => renderFingering(button.dataset.pitch));
+  app.querySelectorAll('[data-source-pitch]').forEach(button => {
+    button.addEventListener('click', () => renderFingering(button.dataset.sourcePitch, button.dataset.displayPitch));
   });
 }
 
-function renderFingering(pitch) {
+function renderFingering(sourcePitch, writtenPitch = sourcePitch) {
   const instrument = instrumentById[state.instrumentId];
-  const notes = notesForRange(instrument);
-  const index = notes.findIndex(note => note.pitch === pitch);
+  const choices = noteChoicesForRange(instrument);
+  const index = choices.findIndex(choice => choice.note.pitch === sourcePitch && choice.pitch === writtenPitch);
   if (index < 0) return;
 
-  state.selectedPitch = pitch;
-  const note = notes[index];
-  const previous = notes[index - 1] || null;
-  const next = notes[index + 1] || null;
+  state.selectedPitch = sourcePitch;
+  state.selectedSpelling = writtenPitch;
+  const choice = choices[index];
+  const note = choice.note;
+  const previous = choices[index - 1] || null;
+  const next = choices[index + 1] || null;
   const label = fingeringLabel(instrument, note);
 
   app.innerHTML = `
@@ -258,9 +287,9 @@ function renderFingering(pitch) {
       <div class="detail-top">
         <section class="note-panel">
           <p class="eyebrow">Written note</p>
-          <div class="note-name">${displayPitch(note.pitch)}</div>
-          <div class="staff-wrap">${renderStaff(note.pitch, instrument.clef)}</div>
-          <p class="octave-label">Pitch ID: ${note.pitch} • ${escapeHtml(instrument.clef)} clef</p>
+          <div class="note-name">${displayPitch(writtenPitch)}</div>
+          <div class="staff-wrap">${renderStaff(writtenPitch, instrument.clef)}</div>
+          <p class="octave-label">Pitch ID: ${writtenPitch} • ${escapeHtml(instrument.clef)} clef</p>
         </section>
         <section class="fingering-panel">
           <p class="eyebrow">${instrument.fingeringType === 'position' ? 'Standard primary position' : 'Standard primary fingering'}</p>
@@ -271,7 +300,7 @@ function renderFingering(pitch) {
       </div>
       <nav class="detail-nav" aria-label="Adjacent notes">
         <button class="nav-button" type="button" data-nav="prev" ${previous ? '' : 'disabled'}>${previous ? `← ${displayPitch(previous.pitch)}` : '←'}</button>
-        <span class="current-chip">${displayPitch(note.pitch, true)}</span>
+        <span class="current-chip">${displayPitch(writtenPitch, true)}</span>
         <button class="nav-button" type="button" data-nav="next" ${next ? '' : 'disabled'}>${next ? `${displayPitch(next.pitch)} →` : '→'}</button>
       </nav>
     </article>
@@ -284,15 +313,16 @@ function renderFingering(pitch) {
   app.querySelectorAll('[data-range]').forEach(button => {
     button.addEventListener('click', () => {
       state.rangeMode = button.dataset.range;
-      const available = notesForRange(instrument);
-      if (available.some(n => n.pitch === state.selectedPitch)) renderFingering(state.selectedPitch);
-      else renderNotePicker();
+      const available = noteChoicesForRange(instrument);
+      if (available.some(choice => choice.note.pitch === state.selectedPitch && choice.pitch === state.selectedSpelling)) {
+        renderFingering(state.selectedPitch, state.selectedSpelling);
+      } else renderNotePicker();
     });
   });
 
   app.querySelector('#backToNotes').addEventListener('click', renderNotePicker);
-  app.querySelector('[data-nav="prev"]').addEventListener('click', () => previous && renderFingering(previous.pitch));
-  app.querySelector('[data-nav="next"]').addEventListener('click', () => next && renderFingering(next.pitch));
+  app.querySelector('[data-nav="prev"]').addEventListener('click', () => previous && renderFingering(previous.note.pitch, previous.pitch));
+  app.querySelector('[data-nav="next"]').addEventListener('click', () => next && renderFingering(next.note.pitch, next.pitch));
 }
 
 function auditInstrumentId() {
